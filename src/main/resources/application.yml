@@ -1,0 +1,8 @@
+kinesis:
+  stream: default
+  region: us-east-1
+endpoint:
+  url: http://localhost:8080/data
+  okerrors:
+    - 400, 408, 422
+  method: POST

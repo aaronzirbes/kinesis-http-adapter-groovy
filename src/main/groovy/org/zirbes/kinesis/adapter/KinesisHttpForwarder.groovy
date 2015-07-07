@@ -30,9 +30,7 @@ class KinesisHttpForwarder {
 
     AWSCredentialsProvider credProvider = new ProfileCredentialsProvider()
 
-    KinesisHttpForwarder() {
-        this.credProvider = credProvider
-    }
+    KinesisHttpForwarder() { }
 
     void start() {
         EndpointConfiguration endpointConfig = new EndpointConfiguration(METHOD, URL, MEDIA_TYPE, OK_ERRORS)

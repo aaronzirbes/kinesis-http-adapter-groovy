@@ -12,9 +12,9 @@ dependencies {
 
     compile 'org.codehaus.groovy:groovy-all:2.4.3'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
-    compile 'com.netflix.rxjava:rxjava-groovy:0.20.7'
+    compile 'io.reactivex:rxgroovy:1.0.0'
     compile 'com.amazonaws:amazon-kinesis-client:1.4.0'
     compile 'org.slf4j:slf4j-simple:1.7.12'
-    
+
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }

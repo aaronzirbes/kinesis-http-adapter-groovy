@@ -5,11 +5,7 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorC
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason
 import com.amazonaws.services.kinesis.model.Record
 
-import com.squareup.okhttp.MediaType
 import com.squareup.okhttp.OkHttpClient
-import com.squareup.okhttp.Request
-import com.squareup.okhttp.RequestBody
-import com.squareup.okhttp.Response
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -35,17 +31,7 @@ class KinesisDataProcessor implements IRecordProcessor {
 
     @Override
     void processRecords(List<Record> records, IRecordProcessorCheckpointer checkpointer) {
-        Observable.create{ Subscriber<HttpResult> subscriber ->
-            Thread.start {
-                records.each{ record ->
-                    if (subscriber.unsubscribed) { return }
-                    subscriber.onNext(forwarder.post(record))
-
-                }
-                if (!subscriber.unsubscribed) { subscriber.onCompleted() }
-            }
-            return subscriber
-        }.subscribe{ HttpResult result ->
+        observableForRecords(records).subscribe{ HttpResult result ->
             if (result.success) {
                 checkpointer.checkpoint(result.record)
             }
@@ -57,4 +43,20 @@ class KinesisDataProcessor implements IRecordProcessor {
         log.warn "Shutting down. ${reason}"
         checkpointer.checkpoint()
     }
+
+    protected Observable<HttpResult> observableForRecords(Collection<Record> records) {
+        Observable.create(new Observable.OnSubscribe() {
+            @Override
+            void call(Subscriber subscriber) {
+                Thread.start {
+                    records.each{ Record record ->
+                        if (subscriber.unsubscribed) { return }
+                        subscriber.onNext(forwarder.post((record)))
+                    }
+                    if (!subscriber.unsubscribed) { subscriber.onCompleted() }
+                }
+            }
+        })
+    }
+
 }
